@@ -500,6 +500,22 @@ button:focus-visible {
   min-height: 82px;
 }
 
+.month-cell.office-day {
+  position: relative;
+}
+
+.month-cell.office-day::before {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent-3, #3d86d7);
+}
+
 .month-cell .week-extra {
   font-size: 0.66rem;
   font-weight: 700;

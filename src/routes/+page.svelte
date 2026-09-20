@@ -12,6 +12,7 @@
     inCurrentMonth: boolean;
     isToday: boolean;
     isWeekend: boolean;
+    isOfficeDay: boolean;
     weekdayShort: string;
   };
 
@@ -57,6 +58,7 @@
         month === now.getMonth() &&
         day === now.getDate(),
       isWeekend: weekday === 0 || weekday === 6,
+      isOfficeDay: false,
       weekdayShort: weekdayHeaders[(weekday + 6) % 7],
     };
   };
@@ -267,6 +269,9 @@
   const remainingToTargetMinutes = $derived(
     Math.max(0, 8 * 60 - selectedDayDisplayMinutes),
   );
+  const selectedDayIsOffice = $derived(
+    selectedDayEntry?.isOfficeDay ?? false,
+  );
 
   $effect(() => {
     if (!selectedDayEntry) return;
@@ -373,6 +378,17 @@
       }),
     );
 
+    const officeResults = await Promise.all(
+      monthKeys.map(async (monthKey) => {
+        const res = await fetch(`/api/office?month=${monthKey}`);
+        const payload = await res.json();
+
+        return {
+          officeDays: (payload?.data?.officeDays ?? []) as string[],
+        };
+      }),
+    );
+
     const dayMap: Record<string, number> = {};
     let firstError = "";
 
@@ -383,10 +399,18 @@
       }
     }
 
+    const officeSet = new Set<string>();
+    for (const result of officeResults) {
+      for (const officeDay of result.officeDays) {
+        officeSet.add(officeDay);
+      }
+    }
+
     monthPreviewDays = monthPreviewDays.map((entry) => {
       return {
         ...entry,
         minutes: Number(dayMap[entry.dateIso] ?? 0),
+        isOfficeDay: officeSet.has(entry.dateIso),
       };
     });
 
@@ -453,6 +477,31 @@
     );
 
     inputError = "";
+    apiMessage = "";
+  };
+
+  const toggleOfficeDay = () => {
+    void toggleOfficeDayAsync();
+  };
+
+  const toggleOfficeDayAsync = async () => {
+    const day = selectedDateIso(selectedDay);
+    const isOffice = selectedDayEntry?.isOfficeDay;
+    const method = isOffice ? "DELETE" : "PUT";
+    const res = await fetch(`/api/office/${day}`, { method });
+    const payload = await res.json();
+
+    if (!res.ok) {
+      apiMessage = payload?.error?.message ?? "Could not toggle office day.";
+      return;
+    }
+
+    monthPreviewDays = monthPreviewDays.map((entry) =>
+      entry.day === selectedDay && entry.inCurrentMonth
+        ? { ...entry, isOfficeDay: !isOffice }
+        : entry,
+    );
+
     apiMessage = "";
   };
 
@@ -707,7 +756,7 @@
               <div class="month-week-days">
                 {#each week as day}
                   <button
-                    class={`month-cell ${intensityClass(day.minutes / 60)} ${day.isWeekend ? "weekend" : ""} ${day.isToday ? "active" : ""} ${day.inCurrentMonth ? "" : "outside-month"} ${selectedDay === day.day && day.inCurrentMonth ? "selected" : ""}`}
+                    class={`month-cell ${intensityClass(day.minutes / 60)} ${day.isWeekend ? "weekend" : ""} ${day.isToday ? "active" : ""} ${day.isOfficeDay ? "office-day" : ""} ${day.inCurrentMonth ? "" : "outside-month"} ${selectedDay === day.day && day.inCurrentMonth ? "selected" : ""}`}
                     style={monthCellOvertimeStyle(day.minutes)}
                     onclick={() => selectCalendarCell(day)}
                     aria-label={`Set tracked hours for ${day.weekdayShort} day ${day.day}`}
@@ -757,6 +806,19 @@
           <button class="primary" onclick={applyHoursToSelectedDay}
             >Set Hours</button
           >
+        </div>
+        <div class="month-editor-row">
+          <button
+            class="secondary"
+            onclick={toggleOfficeDay}
+            aria-label={`${selectedDayIsOffice ? "Remove" : "Mark"} as office day`}
+          >
+            {#if selectedDayIsOffice}
+              🏢 Office Day (click to remove)
+            {:else}
+              🏠 Mark Office Day
+            {/if}
+          </button>
         </div>
         {#if inputError}
           <p class="form-error">{inputError}</p>

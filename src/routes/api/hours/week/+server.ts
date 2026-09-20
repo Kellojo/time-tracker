@@ -1,6 +1,6 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
 import { requireUserIdWithApiKey } from "$lib/server/auth";
-import { getDayTotalsBetween, getTimerStatus } from "$lib/server/db";
+import { getDayTotalsBetween, getTimerStatus, getOfficeDaysBetween } from "$lib/server/db";
 
 function toIsoLocalDate(date: Date) {
   const y = date.getFullYear();
@@ -43,6 +43,7 @@ export const GET: RequestHandler = async (event) => {
 
   const storedByDay = getDayTotalsBetween(userId, weekStart, weekEnd);
   const timer = getTimerStatus(userId);
+  const officeDays = getOfficeDaysBetween(userId, weekStart, weekEnd);
   const runningMinutes = timer.isRunning
     ? Math.floor(timer.elapsedSeconds / 60)
     : 0;
@@ -80,6 +81,8 @@ export const GET: RequestHandler = async (event) => {
       weekStart,
       weekEnd,
       days: weekDays,
+      officeDays,
+      officeDaysCount: officeDays.length,
       weekTotalMinutesStored,
       weekTotalMinutesStoredHuman,
       weekTotalMinutesEffective,

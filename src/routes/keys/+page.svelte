@@ -27,7 +27,7 @@
   let keyError = $state("");
   let newApiKey = $state("");
 
-  const keyScopeOptions = ["timer:start", "timer:stop", "hours:read"];
+  const keyScopeOptions = ["timer:start", "timer:stop", "hours:read", "office:write"];
 
   const applyTheme = (value: "light" | "dark") => {
     theme = value;
@@ -311,6 +311,22 @@
           <p><span class="method-tag method-get">GET</span> /api/hours/week</p>
           <p class="muted">Scope: hours:read (current week Monday-Sunday)</p>
         </article>
+        <article class="endpoint-item">
+          <p><span class="method-tag method-get">GET</span> /api/hours/year</p>
+          <p class="muted">Scope: hours:read (?year=YYYY optional)</p>
+        </article>
+        <article class="endpoint-item">
+          <p><span class="method-tag">PUT</span> /api/office/&#123;date&#125;</p>
+          <p class="muted">Scope: office:write (mark day as office day)</p>
+        </article>
+        <article class="endpoint-item">
+          <p><span class="method-tag">DELETE</span> /api/office/&#123;date&#125;</p>
+          <p class="muted">Scope: office:write (remove office day marker)</p>
+        </article>
+        <article class="endpoint-item">
+          <p><span class="method-tag method-get">GET</span> /api/office?month=YYYY-MM</p>
+          <p class="muted">Scope: hours:read (list office days for month)</p>
+        </article>
       </div>
 
       <p class="api-keys-label">Authorization header</p>
@@ -327,6 +343,10 @@
         class="api-snippet">curl "$BASE_URL/api/hours/2026-04-03" -H "Authorization: Bearer $API_KEY"</pre>
       <pre
         class="api-snippet">curl "$BASE_URL/api/hours/week" -H "Authorization: Bearer $API_KEY"</pre>
+      <pre
+        class="api-snippet">curl "$BASE_URL/api/hours/year" -H "Authorization: Bearer $API_KEY"</pre>
+      <pre
+        class="api-snippet">curl -X PUT "$BASE_URL/api/office/2026-04-03" -H "Authorization: Bearer $API_KEY"</pre>
     </article>
   </section>
 </main>

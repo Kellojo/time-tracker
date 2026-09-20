@@ -4,7 +4,7 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { hashApiKey, requireUserId } from "$lib/server/auth";
 import { createApiKey, listApiKeys } from "$lib/server/db";
 
-const ALLOWED_SCOPES = ["timer:start", "timer:stop", "hours:read"] as const;
+const ALLOWED_SCOPES = ["timer:start", "timer:stop", "hours:read", "office:write"] as const;
 
 type AllowedScope = (typeof ALLOWED_SCOPES)[number];
 

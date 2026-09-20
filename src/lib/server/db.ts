@@ -32,6 +32,14 @@ function createDb() {
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
 
+    CREATE TABLE IF NOT EXISTS office_days (
+      user_id TEXT NOT NULL,
+      day TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      PRIMARY KEY (user_id, day),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
     CREATE TABLE IF NOT EXISTS active_timers (
       user_id TEXT PRIMARY KEY,
       started_at_epoch INTEGER NOT NULL,
@@ -52,6 +60,7 @@ function createDb() {
 
     CREATE INDEX IF NOT EXISTS idx_day_totals_user_day ON day_totals(user_id, day);
     CREATE INDEX IF NOT EXISTS idx_api_keys_user_id ON api_keys(user_id);
+    CREATE INDEX IF NOT EXISTS idx_office_days_user_day ON office_days(user_id, day);
   `);
 
   return db;
@@ -341,4 +350,65 @@ export function stopTimer(userId: string, day: string) {
   });
 
   return tx();
+}
+
+export function setOfficeDay(userId: string, day: string) {
+  const db = getDb();
+  db.prepare(
+    "INSERT OR IGNORE INTO office_days (user_id, day, created_at) VALUES (?, ?, ?)",
+  ).run(userId, day, new Date().toISOString());
+}
+
+export function removeOfficeDay(userId: string, day: string) {
+  const db = getDb();
+  db.prepare("DELETE FROM office_days WHERE user_id = ? AND day = ?").run(
+    userId,
+    day,
+  );
+}
+
+export function getMonthOfficeDays(userId: string, month: string) {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      "SELECT day FROM office_days WHERE user_id = ? AND day LIKE ?",
+    )
+    .all(userId, `${month}-%`) as Array<{ day: string }>;
+
+  return rows.map((row) => row.day);
+}
+
+export function getOfficeDaysBetween(
+  userId: string,
+  startDay: string,
+  endDay: string,
+) {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      "SELECT day FROM office_days WHERE user_id = ? AND day >= ? AND day <= ?",
+    )
+    .all(userId, startDay, endDay) as Array<{ day: string }>;
+
+  return rows.map((row) => row.day);
+}
+
+export function getOfficeDaysInYear(userId: string, year: number) {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      "SELECT day FROM office_days WHERE user_id = ? AND day >= ? AND day <= ?",
+    )
+    .all(userId, `${year}-01-01`, `${year}-12-31`) as Array<{ day: string }>;
+
+  return rows.map((row) => row.day);
+}
+
+export function isOfficeDay(userId: string, day: string) {
+  const db = getDb();
+  const row = db
+    .prepare("SELECT 1 FROM office_days WHERE user_id = ? AND day = ?")
+    .get(userId, day);
+
+  return !!row;
 }
