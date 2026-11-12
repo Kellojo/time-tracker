@@ -4,7 +4,7 @@ services:
     container_name: time-tracker
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       BETTER_AUTH_URL: http://localhost:3000
       BETTER_AUTH_SECRET: replace-with-a-long-random-string
