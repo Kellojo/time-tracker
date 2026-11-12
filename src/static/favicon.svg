@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="16" fill="#111111"/>
-  <rect x="12" y="30" width="8" height="20" rx="3" fill="#777777"/>
-  <rect x="24" y="22" width="8" height="28" rx="3" fill="#ffffff"/>
-  <rect x="36" y="14" width="8" height="36" rx="3" fill="#ffffff"/>
-  <rect x="48" y="26" width="8" height="24" rx="3" fill="#777777"/>
+  <!-- Time Tracker: a clock inside the green "day progress" ring. Heavy strokes so it reads at tab size. -->
+  <rect width="64" height="64" rx="14" fill="#282624"/>
+  <circle cx="32" cy="32" r="20" fill="none" stroke="#ffffff" stroke-opacity=".18" stroke-width="8"/>
+  <circle cx="32" cy="32" r="20" fill="none" stroke="#2fb267" stroke-width="8" stroke-linecap="round" pathLength="100" stroke-dasharray="68 100" transform="rotate(-90 32 32)"/>
+  <path d="M32 23v10l6 4" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

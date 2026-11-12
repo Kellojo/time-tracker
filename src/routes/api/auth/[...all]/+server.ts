@@ -1,8 +1,8 @@
-import type { RequestHandler } from "./$types";
-import { auth } from "../../../../auth";
+import type { RequestHandler } from './$types';
+import { auth } from '$lib/server/better-auth';
 
 const handleAuthRequest: RequestHandler = async ({ request }) => {
-  return auth.handler(request);
+	return auth.handler(request);
 };
 
 export const GET = handleAuthRequest;
