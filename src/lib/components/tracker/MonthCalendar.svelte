@@ -140,15 +140,18 @@
 		return `background-color: color-mix(in oklch, var(--heat) ${strength.toFixed(1)}%, transparent)`;
 	}
 
+	/** Short duration for narrow cells: `8h`, `7h30`, `45m` (never a bare `00`). */
 	function compact(minutes: number) {
 		const h = Math.floor(minutes / 60);
 		const m = minutes % 60;
+		if (h === 0) return `${m}m`;
+		if (m === 0) return `${h}h`;
 		return `${h}h${String(m).padStart(2, '0')}`;
 	}
 
 	function signedCompact(minutes: number) {
 		const rounded = Math.round(minutes);
-		if (rounded === 0) return '0:00';
+		if (rounded === 0) return '0m';
 		return `${rounded < 0 ? '−' : '+'}${compact(Math.abs(rounded))}`;
 	}
 
@@ -275,7 +278,9 @@
 								{/if}
 							</span>
 							{#if cell.minutes > 0}
-								<span class="text-[0.65rem] leading-none font-medium tabular sm:text-xs">
+								<span
+									class="text-[0.65rem] leading-none font-medium tracking-tight tabular sm:text-xs sm:tracking-normal"
+								>
 									<span class="sm:hidden">{compact(cell.minutes)}</span>
 									<span class="max-sm:hidden">{formatMinutes(cell.minutes)}</span>
 								</span>
