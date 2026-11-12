@@ -113,6 +113,9 @@
 	}
 	html {
 		@apply font-sans;
+		/* Always reserve the scrollbar's space, so content doesn't shift sideways between pages
+		   that scroll and pages that don't (bits-ui's scroll lock detects this and adds no padding). */
+		scrollbar-gutter: stable;
 	}
 
 	/* Tailwind 4's preflight no longer gives buttons a pointer cursor; restore it. */
