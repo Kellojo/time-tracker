@@ -52,10 +52,16 @@
 		}, 6000);
 
 		try {
-			const res = await fetch('/api/auth/sign-in/oauth2', {
+			// Better Auth >= 1.7 serves generic OAuth providers through the core social endpoints
+			// (sign-in: /sign-in/social, callback: /callback/oidc) instead of /sign-in/oauth2.
+			const res = await fetch('/api/auth/sign-in/social', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({ providerId: 'oidc', callbackURL: safeCallback() }),
+				body: JSON.stringify({
+					provider: 'oidc',
+					callbackURL: safeCallback(),
+					disableRedirect: true
+				}),
 				signal: attempt.signal
 			});
 			const payload = await res.json().catch(() => null);

@@ -46,6 +46,8 @@ Notes:
 - `BETTER_AUTH_URL` must match the public URL you will use in the browser.
 - `BETTER_AUTH_SECRET` should be a long random string.
 - Keep OIDC values in sync with your identity provider app settings.
+- Register `<BETTER_AUTH_URL>/api/auth/callback/oidc` as the callback (redirect) URL of the
+  OIDC client, e.g. `https://time.example.com/api/auth/callback/oidc`.
 
 ### 3. Build and start
 
